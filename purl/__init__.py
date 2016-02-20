@@ -90,6 +90,10 @@ class Purl(object):
     except KeyError:
       pass
 
+  ##
+  def param(self, param, value=None):
+    return self
+
   ## generate querystring
   def querystring(self):
     qs = ''
