@@ -2,3 +2,8 @@
 *.pyc
 __pycache__
 .cache
+
+.pypirc
+dist
+*.egg-info
+
