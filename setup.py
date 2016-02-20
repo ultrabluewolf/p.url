@@ -4,12 +4,21 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-  long_description = f.read()
+# with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+#   long_description = f.read()
+
+try:
+    from pypandoc import convert
+    read_md = lambda f: convert(f, 'rst')
+except ImportError:
+    print("warning: pypandoc module not found, could not convert Markdown to RST")
+    read_md = lambda f: open(f, 'r').read()
+
+long_description = read_md('README.md')
 
 setup(
   name='p.url',
-  version='0.1.0a1',
+  version='0.1.0a3',
 
   description='A simple url parsing library for python',
   long_description=long_description,
