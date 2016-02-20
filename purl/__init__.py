@@ -1,6 +1,6 @@
 import re
 from builtins import object
-from . import purl_exc
+from . import exceptions
 
 class Purl(object):
 
@@ -12,7 +12,7 @@ class Purl(object):
 
     # protocol and host are required
     if len(baseurl_split) != 2:
-      raise purl_exc.InvalidUrlError
+      raise exceptions.InvalidUrlError
 
     host_port_split = baseurl_split[1].split(':')
 
@@ -30,7 +30,7 @@ class Purl(object):
 
       # check port format
       if not re.match(r':\d+', self.port):
-        raise purl_exc.InvalidUrlError
+        raise exceptions.InvalidUrlError
 
     # hostname + (path)
     else:

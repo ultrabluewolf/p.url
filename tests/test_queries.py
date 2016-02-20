@@ -1,4 +1,4 @@
-from lib.purl import Purl
+from purl import Purl
 
 class TestQueryFunctions(object):
 

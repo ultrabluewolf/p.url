@@ -1,7 +1,7 @@
 import pytest
 
-from lib.purl import Purl
-from lib.purl_exc import *
+from purl import Purl
+from purl.exceptions import *
 
 class TestParserFunctions(object):
 
