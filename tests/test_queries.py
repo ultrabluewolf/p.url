@@ -34,6 +34,10 @@ class TestQueryFunctions(object):
     url.add_query({'a': 'one', 'c': 45})
     assert str(url) == 'https://hello.org?a=one&c=45&d=dee&g=gamma'
 
+    url = Purl('https://hello.org?g=gamma&d=dee')
+    url.add_query({'a': False, 'c': True})
+    assert str(url) == 'https://hello.org?a=false&c=true&d=dee&g=gamma'
+
   def test_delete_query(self):
     url = Purl('http://blank.com')
     url.delete_query('bat');

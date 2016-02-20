@@ -94,8 +94,8 @@ class Purl(object):
   def querystring(self):
     qs = ''
     for k in self.query:
-      k = self.__encode_string(str(k))
-      v = self.__encode_string(str(self.query[k]))
+      k = self.__encode_string(k)
+      v = self.__encode_string(self.query[k])
       qs += k + '=' + v + '&'
     # remove trailing ampersand
     if self.query:
@@ -114,8 +114,21 @@ class Purl(object):
 
   ## encode/decode stubs
   def __encode_string(self, s):
+    if isinstance(s, bool):
+      if s == True:
+        s = 'true'
+      elif s == False:
+        s = 'false'
+    s = str(s)
+
     return s
+
   def __decode_string(self, s):
+    if s == 'true':
+      s = True
+    elif s == 'false':
+      s = False
+
     return s
 
   ## generate url string
