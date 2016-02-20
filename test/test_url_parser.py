@@ -19,12 +19,16 @@ class TestParserFunctions(object):
     assert str(url) == str_url
 
   def test_invalid_url(self):
+
     with pytest.raises(InvalidUrlError):
       Purl('bad')
+
     with pytest.raises(InvalidUrlError):
       Purl('bad.com/abc/def')
+
     with pytest.raises(InvalidUrlError):
       Purl('http://bad:xwy/one/2/three')
+
     with pytest.raises(InvalidUrlError):
       Purl('http://bad://?hello')
 
