@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
+
 from purl import Purl
 
 class TestQueryFunctions(object):

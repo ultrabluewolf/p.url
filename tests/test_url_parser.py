@@ -1,4 +1,5 @@
-import pytest
+import sys, os, pytest
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 from purl import Purl
 from purl.exceptions import *
