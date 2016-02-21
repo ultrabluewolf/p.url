@@ -51,3 +51,17 @@ str(url.delete_query('q')
   .delete_query('type')) # => 'https://github.com/search?l=JavaScript'
 
 ```
+
+### Params
+
+...
+
+## Running the tests
+
+make sure you have py test installed
+
+`pip install pytest`
+
+Then run:
+
+`py.test`

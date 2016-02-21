@@ -48,6 +48,21 @@ class Purl(object):
     except IndexError:
       self.query = {}
 
+  @staticmethod
+  def create_with(options):
+    url = ''
+    try:
+      url = options['protocol'] + options['hostname']
+    except KeyError:
+      raise exceptions.InvalidUrlError
+
+    if 'port' in options:
+      url += options['port']
+    if 'path' in options:
+      url += options['path']
+
+    return Purl(url)
+
   ## url splitting helper
   def __split_once(self, s, target):
     idx = s.find(target)
