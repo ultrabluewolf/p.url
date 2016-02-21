@@ -72,3 +72,66 @@ class TestParserFunctions(object):
     assert url.hostname == 'filesys'
     assert url.port     == None
     assert url.path     == '/somefile.png'
+
+  def test_create_with(self):
+    expected = Purl('file://blank')
+    url = Purl.create_with({
+      'protocol': 'file://',
+      'hostname': 'blank'
+    })
+    assert(str(url) == str(expected))
+
+    expected = Purl('https://blank:321/some/path')
+    url = Purl.create_with({
+      'protocol': 'https://',
+      'hostname': 'blank',
+      'port': ':321',
+      'path': '/some/path'
+    })
+    assert(str(url) == str(expected))
+
+    expected = Purl('https://blank:321/some/path?a=1&b=2&c=false')
+    url = Purl.create_with({
+      'protocol': 'https://',
+      'hostname': 'blank',
+      'port': ':321',
+      'path': '/some/path?a=1&b=2&c=false'
+    })
+    assert(str(url) == str(expected))
+
+    expected = Purl('http://somehost/some/path?a=1&b=2&c=false')
+    url = Purl.create_with({
+      'protocol': 'http://',
+      'hostname': 'somehost',
+      'path': '/some/path?a=1&b=2&c=false'
+    })
+    assert(str(url) == str(expected))
+
+  def test_create_with_invalid_args(self):
+    with pytest.raises(InvalidUrlError):
+      Purl.create_with({})
+
+    with pytest.raises(InvalidUrlError):
+      Purl.create_with({
+        'hostname': 'dne'
+      })
+
+    with pytest.raises(InvalidUrlError):
+      Purl.create_with({
+        'protocol': 'ssh',
+        'hostname': 'bad'
+      })
+
+    with pytest.raises(InvalidUrlError):
+      Purl.create_with({
+        'protocol': 'ssh://',
+        'hostname': 'bad',
+        'port': ':abc'
+      })
+
+    with pytest.raises(InvalidUrlError):
+      Purl.create_with({
+        'protocol': 'ssh://',
+        'hostname': 'bad',
+        'port': '321'
+      })

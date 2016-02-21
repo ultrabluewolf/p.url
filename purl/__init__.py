@@ -29,7 +29,7 @@ class Purl(object):
         self.path = port_path[1]
 
       # check port format
-      if not re.match(r':\d+', self.port):
+      if not Purl.__is_valid_port(self.port):
         raise exceptions.InvalidUrlError
 
     # hostname + (path)
@@ -57,11 +57,18 @@ class Purl(object):
       raise exceptions.InvalidUrlError
 
     if 'port' in options:
+      if not Purl.__is_valid_port(options['port']):
+        raise exceptions.InvalidUrlError
       url += options['port']
     if 'path' in options:
       url += options['path']
 
     return Purl(url)
+
+  # check port format
+  @staticmethod
+  def __is_valid_port(port):
+    return not not re.match(r':\d+', port)
 
   ## url splitting helper
   def __split_once(self, s, target):
