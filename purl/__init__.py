@@ -4,8 +4,15 @@ from . import exceptions
 
 class Purl(object):
 
-  def __init__(self, url):
+  def __init__(self, url, **options):
     super(Purl, self).__init__()
+    self.param_interpolate = {
+      'start': ':',
+      'end': ''
+    }
+    for opt in options:
+      if opt == 'interpolate' and len(options[opt]):
+        self.setup_interpolate_settings(options[opt])
 
     split_url     = url.split('?')
     baseurl_split = split_url[0].split('://')
@@ -107,6 +114,14 @@ class Purl(object):
       host_port_split = [host_port]
     return host_port_split
 
+  def setup_interpolate_settings(self, options):
+    if isinstance(options, str):
+      self.param_interpolate['start'] = options
+    else:
+      self.param_interpolate['start'] = options[0]
+      if len(options) == 2:
+        self.param_interpolate['end'] = options[1]
+
   ## update query
   def add_query(self, query, value=None):
     if value is None:
@@ -152,14 +167,14 @@ class Purl(object):
       param = self.__to_param_key(param)
 
       for i in range(0, len(split_path)):
-        if (param == split_path[i]):
+        if (param == re.sub(' ', '', split_path[i])):
           split_path[i] = Purl.__encode_string(value)
 
     path = '/'.join(split_path)
     return path
 
   def __to_param_key(self, param):
-    return ':' + str(param)
+    return self.param_interpolate['start'] + str(param) + self.param_interpolate['end']
 
   ## generate querystring
   def querystring(self):
