@@ -16,34 +16,34 @@ class Purl(object):
 
     host_port_split = Purl.__split_hostname_and_port(baseurl_split[1])
 
-    self.protocol = baseurl_split[0] + '://'
-    self.hostname = host_port_split[0]
-    self.port     = None
-    self.path     = None
+    self._protocol = baseurl_split[0] + '://'
+    self._hostname = host_port_split[0]
+    self._port     = None
+    self._path     = None
 
-    self.__params = {}
+    self._params = {}
     self.query    = None
-    self.__path_compiled = None
+    self._path_compiled = None
 
     # port + (path)
     if len(host_port_split) == 2:
       port_path = Purl.__split_once(host_port_split[1], '/')
-      self.port = ':' + port_path[0]
+      self._port = ':' + port_path[0]
       if len(port_path) == 2:
-        self.path = port_path[1]
+        self._path = port_path[1]
 
       # check port format
-      if not Purl.__is_valid_port(self.port):
+      if not Purl.__is_valid_port(self._port):
         raise exceptions.InvalidUrlError
 
     # hostname + (path)
     else:
       hostname_path = Purl.__split_once(host_port_split[0], '/')
       if len(hostname_path) == 2:
-        self.hostname = hostname_path[0]
-        self.path     = hostname_path[1]
+        self._hostname = hostname_path[0]
+        self._path     = hostname_path[1]
 
-    if len(self.hostname) < 1:
+    if len(self._hostname) < 1:
       raise purl_exc.InvalidUrlError
 
     # (query)
@@ -137,18 +137,18 @@ class Purl(object):
   def param(self, param, value=None):
     if value is None:
       for k in param:
-        self.__params[k] = param[k]
+        self._params[k] = param[k]
     else:
-      self.__params[param] = value
+      self._params[param] = value
 
-    self.__path_compiled = self.path_with_params()
+    self._path_compiled = self.path_with_params()
     return self
 
   def path_with_params(self):
-    split_path = self.path.split('/')
+    split_path = self._path.split('/')
 
-    for param in self.__params:
-      value = self.__params[param]
+    for param in self._params:
+      value = self._params[param]
       param = self.__to_param_key(param)
 
       for i in range(0, len(split_path)):
@@ -207,16 +207,16 @@ class Purl(object):
 
   ## generate url string
   def __str__(self):
-    url = self.protocol + self.hostname
+    url = self._protocol + self._hostname
     qs  = self.querystring()
 
-    if self.port:
-      url += self.port
-    if self.path:
-      if self.__path_compiled:
-        url += self.__path_compiled
+    if self._port:
+      url += self._port
+    if self._path:
+      if self._path_compiled:
+        url += self._path_compiled
       else:
-        url += self.path
+        url += self._path
 
     if qs:
       url += '?' + qs
@@ -225,3 +225,33 @@ class Purl(object):
   def __repr__(self):
     s = '<Purl: url="' + str(self) + '">'
     return s  
+
+  ## attribute getters and chainable setters
+
+  def protocol(self, value=None):
+    if value is None:
+      return self._protocol
+    else:
+      self._protocol = value
+      return self
+
+  def hostname(self, value=None):
+    if value is None:
+      return self._hostname
+    else:
+      self._hostname = value
+      return self
+
+  def port(self, value=None):
+    if value is None:
+      return self._port
+    else:
+      self._port = value
+      return self
+
+  def path(self, value=None):
+    if value is None:
+      return self._path
+    else:
+      self._path = value
+      return self

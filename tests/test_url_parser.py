@@ -56,22 +56,30 @@ class TestParserFunctions(object):
 
   def test_fields(self):
     url = Purl('sftp://secure-site:123')
-    assert url.protocol == 'sftp://'
-    assert url.hostname == 'secure-site'
-    assert url.port     == ':123'
-    assert url.path     == None
+    assert url.protocol() == 'sftp://'
+    assert url.hostname() == 'secure-site'
+    assert url.port()     == ':123'
+    assert url.path()     == None
 
     url = Purl('http://nada.com')
-    assert url.protocol == 'http://'
-    assert url.hostname == 'nada.com'
-    assert url.port     == None
-    assert url.path     == None
+    assert url.protocol() == 'http://'
+    assert url.hostname() == 'nada.com'
+    assert url.port()     == None
+    assert url.path()     == None
 
     url = Purl('file://filesys/somefile.png')
-    assert url.protocol == 'file://'
-    assert url.hostname == 'filesys'
-    assert url.port     == None
-    assert url.path     == '/somefile.png'
+    assert url.protocol() == 'file://'
+    assert url.hostname() == 'filesys'
+    assert url.port()     == None
+    assert url.path()     == '/somefile.png'
+
+    expected = 'https://firehouse.com:3333/freedom'
+    url = Purl('http://blank')
+    assert str(url.protocol('https://')
+      .hostname('firehouse.com')
+      .path('/freedom')
+      .port(':3333')) == expected
+    assert str(url) == expected
 
   def test_create_with(self):
     expected = Purl('file://blank')
