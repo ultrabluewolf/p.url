@@ -13,7 +13,7 @@ class TestParserFunctions(object):
     }).param('id', 41)
     assert str(url) == expected
 
-    expected = 'http://blank/resource/41/hello'
+    expected = 'http://blank/resource/hello/nested-item'
     url.param('id', 'hello')
     assert str(url) == expected
 
@@ -32,3 +32,8 @@ class TestParserFunctions(object):
       'misc': 'new'
     }).add_query('msg', 'world').delete_query('there')
     assert str(url) == expected
+
+    expected = 'http://www.site.edu:123/web52/stream/p?msg=false'
+    assert str(url.add_query('msg', False)
+      .param('action', 'stream')
+      .param('misc','p')) == expected

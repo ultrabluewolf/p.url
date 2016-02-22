@@ -1,5 +1,5 @@
 import re
-from builtins import object
+from builtins import object, range
 from . import exceptions
 
 class Purl(object):
@@ -14,12 +14,26 @@ class Purl(object):
     if len(baseurl_split) != 2:
       raise exceptions.InvalidUrlError
 
-    host_port_split = baseurl_split[1].split(':')
+    #host_port_split = baseurl_split[1].split(':')
+    host_port_split = None
+    host_port_match = re.search('[a-zA-Z](:)', baseurl_split[1])
+    if host_port_match:
+      border = host_port_match.start(1)
+      host_port_split = [
+        baseurl_split[1][0:border],
+        baseurl_split[1][border + 1:]
+      ]
+    else:
+      host_port_split = [baseurl_split[1]]
 
     self.protocol = baseurl_split[0] + '://'
     self.hostname = host_port_split[0]
     self.port     = None
     self.path     = None
+
+    self.__path_compiled = None
+    self.__params = {}
+    self.query = None
 
     # port + (path)
     if len(host_port_split) == 2:
@@ -91,7 +105,7 @@ class Purl(object):
   def add_query(self, query, value=None):
     if value is None:
       for k in query:
-        self.query[k] = query[k]
+        self.add_query(k, query[k])
     else:
       self.query[query] = value
     return self
@@ -112,16 +126,40 @@ class Purl(object):
     except KeyError:
       pass
 
-  ##
+  ## update path params
   def param(self, param, value=None):
+    if value is None:
+      for k in param:
+        self.__params[k] = param[k]
+    else:
+      self.__params[param] = value
+
+    self.__path_compiled = self.path_with_params()
     return self
+
+  def path_with_params(self):
+    split_path = self.path.split('/')
+
+    for param in self.__params:
+      value = self.__params[param]
+      param = self.__to_param_key(param)
+
+      for i in range(0, len(split_path)):
+        if (param == split_path[i]):
+          split_path[i] = Purl.__encode_string(value)
+
+    path = '/'.join(split_path)
+    return path
+
+  def __to_param_key(self, param):
+    return ':' + str(param)
 
   ## generate querystring
   def querystring(self):
     qs = ''
     for k in self.query:
-      k = self.__encode_string(k)
-      v = self.__encode_string(self.query[k])
+      k = Purl.__encode_string(k)
+      v = Purl.__encode_string(self.query[k])
       qs += k + '=' + v + '&'
     # remove trailing ampersand
     if self.query:
@@ -139,7 +177,8 @@ class Purl(object):
     return query
 
   ## encode/decode stubs
-  def __encode_string(self, s):
+  @staticmethod
+  def __encode_string(s):
     if isinstance(s, bool):
       if s == True:
         s = 'true'
@@ -148,8 +187,8 @@ class Purl(object):
     s = str(s)
 
     return s
-
-  def __decode_string(self, s):
+  @staticmethod
+  def __decode_string(s):
     if s == 'true':
       s = True
     elif s == 'false':
@@ -165,7 +204,10 @@ class Purl(object):
     if self.port:
       url += self.port
     if self.path:
-      url += self.path
+      if self.__path_compiled:
+        url += self.__path_compiled
+      else:
+        url += self.path
 
     if qs:
       url += '?' + qs
