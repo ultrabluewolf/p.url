@@ -232,6 +232,8 @@ class Purl(object):
     if value is None:
       return self._protocol
     else:
+      if not re.match('[a-zA-Z]+://', value):
+        raise exceptions.InvalidUrlError
       self._protocol = value
       return self
 
@@ -239,6 +241,8 @@ class Purl(object):
     if value is None:
       return self._hostname
     else:
+      if len(value) < 1 or re.search(r'/|:', value):
+        raise exceptions.InvalidUrlError
       self._hostname = value
       return self
 
@@ -246,6 +250,10 @@ class Purl(object):
     if value is None:
       return self._port
     else:
+      if len(value) and not Purl.__is_valid_port(value):
+        raise exceptions.InvalidUrlError
+      elif len(value) == 0:
+        value = None
       self._port = value
       return self
 
@@ -253,5 +261,9 @@ class Purl(object):
     if value is None:
       return self._path
     else:
+      if len(value) and value[0] != '/':
+        raise exceptions.InvalidUrlError
+      elif len(value) == 0:
+        value = None
       self._path = value
       return self

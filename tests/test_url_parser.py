@@ -81,6 +81,36 @@ class TestParserFunctions(object):
       .port(':3333')) == expected
     assert str(url) == expected
 
+  def test_invalid_fields(self):
+    u = Purl('http://blank')
+
+    with pytest.raises(InvalidUrlError):
+      u.protocol('')
+    with pytest.raises(InvalidUrlError):
+      u.protocol('://')
+    with pytest.raises(InvalidUrlError):
+      u.protocol('abc')
+
+    with pytest.raises(InvalidUrlError):
+      u.hostname('')
+    with pytest.raises(InvalidUrlError):
+      u.hostname('abcd/123/546')
+    with pytest.raises(InvalidUrlError):
+      u.hostname('abcd:123')
+    with pytest.raises(InvalidUrlError):
+      u.hostname('abcd:abcd')
+
+    with pytest.raises(InvalidUrlError):
+      u.port('80')
+    with pytest.raises(InvalidUrlError):
+      u.port(':abcd')
+
+    with pytest.raises(InvalidUrlError):
+      u.path('abcd/123')
+    with pytest.raises(InvalidUrlError):
+      u.path('abcd/123/')
+
+
   def test_create_with(self):
     expected = Purl('file://blank')
     url = Purl.create_with({
