@@ -14,30 +14,20 @@ class Purl(object):
     if len(baseurl_split) != 2:
       raise exceptions.InvalidUrlError
 
-    #host_port_split = baseurl_split[1].split(':')
-    host_port_split = None
-    host_port_match = re.search('[a-zA-Z](:)', baseurl_split[1])
-    if host_port_match:
-      border = host_port_match.start(1)
-      host_port_split = [
-        baseurl_split[1][0:border],
-        baseurl_split[1][border + 1:]
-      ]
-    else:
-      host_port_split = [baseurl_split[1]]
+    host_port_split = Purl.__split_hostname_and_port(baseurl_split[1])
 
     self.protocol = baseurl_split[0] + '://'
     self.hostname = host_port_split[0]
     self.port     = None
     self.path     = None
 
-    self.__path_compiled = None
     self.__params = {}
-    self.query = None
+    self.query    = None
+    self.__path_compiled = None
 
     # port + (path)
     if len(host_port_split) == 2:
-      port_path = self.__split_once(host_port_split[1], '/')
+      port_path = Purl.__split_once(host_port_split[1], '/')
       self.port = ':' + port_path[0]
       if len(port_path) == 2:
         self.path = port_path[1]
@@ -48,7 +38,7 @@ class Purl(object):
 
     # hostname + (path)
     else:
-      hostname_path = self.__split_once(host_port_split[0], '/')
+      hostname_path = Purl.__split_once(host_port_split[0], '/')
       if len(hostname_path) == 2:
         self.hostname = hostname_path[0]
         self.path     = hostname_path[1]
@@ -58,7 +48,7 @@ class Purl(object):
 
     # (query)
     try:
-      self.query = self.__parse_querystring(split_url[1])
+      self.query = Purl.__parse_querystring(split_url[1])
     except IndexError:
       self.query = {}
 
@@ -85,7 +75,8 @@ class Purl(object):
     return not not re.match(r':\d+', port)
 
   ## url splitting helper
-  def __split_once(self, s, target):
+  @staticmethod
+  def __split_once(s, target):
     idx = s.find(target)
     if idx >= 0:
       result = []
@@ -101,6 +92,21 @@ class Purl(object):
       result = result[0]
     return result
 
+  ## generate list containing hostname (and port if available)
+  @staticmethod
+  def __split_hostname_and_port(host_port):
+    host_port_split = None
+    host_port_match = re.search('[a-zA-Z](:)', host_port)
+    if host_port_match:
+      border = host_port_match.start(1)
+      host_port_split = [
+        host_port[0:border],
+        host_port[border + 1:]
+      ]
+    else:
+      host_port_split = [host_port]
+    return host_port_split
+
   ## update query
   def add_query(self, query, value=None):
     if value is None:
@@ -114,13 +120,14 @@ class Purl(object):
   def delete_query(self, query):
     if isinstance(query, list):
       for k in query:
-        self.__del_dict(self.query, k)
+        Purl.__del_dict(self.query, k)
     else:
-      self.__del_dict(self.query, query)
+      Purl.__del_dict(self.query, query)
     return self
 
   ## delete query helper
-  def __del_dict(self, d, k):
+  @staticmethod
+  def __del_dict(d, k):
     try:
       del d[k]
     except KeyError:
@@ -167,7 +174,8 @@ class Purl(object):
     return qs
 
   ## convert querystring into a dict
-  def __parse_querystring(self, qs):
+  @staticmethod
+  def __parse_querystring(qs):
     query = {}
     split_qs = qs.split('&')
     for qs_pair in split_qs:
@@ -187,6 +195,7 @@ class Purl(object):
     s = str(s)
 
     return s
+
   @staticmethod
   def __decode_string(s):
     if s == 'true':
