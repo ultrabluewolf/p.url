@@ -9,13 +9,13 @@ P.url is a simple url parsing library for python. Currently, you can modify quer
 ```py
 from purl import Purl
 
-url = Purl('https://github.com/search?q=cat)
+url = Purl('https://github.com/search?q=cat')
 
 str(url.add_query('q', 'dog')) # => 'https://github.com/search?q=dog'
 ```
 
 ```py
-url = Purl('https://github.com/search)
+url = Purl('https://github.com/search')
 
 str(url.add_query({
   'q': 'cat',
@@ -23,7 +23,9 @@ str(url.add_query({
   'type': 'Issues'
 }))
 
-url = Purl('https://github.com/search)
+# or
+
+url = Purl('https://github.com/search')
 
 str(url.add_query('q', 'cat')
   .add_query('l', 'JavaScript')
@@ -36,7 +38,7 @@ str(url.add_query('q', 'cat')
 ```py
 from purl import Purl
 
-url = Purl('https://github.com/search?q=cat)
+url = Purl('https://github.com/search?q=cat')
 
 str(url.delete_query('q')) # => 'https://github.com/search'
 ```
@@ -46,6 +48,8 @@ url = Purl('https://github.com/search?l=JavaScript&q=cat&type=Issues')
 
 str(url.delete_query(['q', 'type'])) # => https://github.com/search?l=JavaScript
 
+# or
+
 url = Purl('https://github.com/search?l=JavaScript&q=cat&type=Issues')
 str(url.delete_query('q')
   .delete_query('type')) # => 'https://github.com/search?l=JavaScript'
@@ -54,7 +58,25 @@ str(url.delete_query('q')
 
 ### Params
 
-...
+```py
+url = ( Purl('https://some.public.api.com')
+  .path('/:resource/:id/:action')
+  .param('resource', 'user').param('id', 12).param('action', 'favorites')
+)
+str(url)
+
+# or
+
+url = ( Purl('https://some.public.api.com')
+  .path('/:resource/:id/:action')
+  .param({
+    'resource': 'user',
+    'id': 12,
+    'action': 'favorites'
+  })
+)
+str(url) # => 'https://some.public.api.com/user/12/favorites'
+```
 
 ## Running the tests
 

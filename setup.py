@@ -18,7 +18,7 @@ long_description = read_md('README.md')
 
 setup(
   name='p.url',
-  version='0.1.0a3',
+  version='0.1.0a4',
 
   description='A simple url parsing library for python',
   long_description=long_description,
